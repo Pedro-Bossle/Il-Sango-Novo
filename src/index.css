@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Ancizar+Serif:ital,wght@0,300..900;1,300..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+
+:root {
+  /*Cores*/
+  --bordo-degrade: linear-gradient(90deg, #42031c 0%, #691831 50%, #42031c 100%);
+  --dourado-degrade: linear-gradient(90deg, #724407 0%, #946527 50%, #724407 100%);
+  --amarelo-bordo-degrade: linear-gradient(90deg, #89570D 0%, #603a17 50%, #2E140C 100%);
+  --bordo: #530526;
+  --amarelo-dourado: #c57c1d;
+  --cinza-bege: #D6CFB4;
+  --branco-visivel: #f6f6f6;
+  --branco-puro: #ffffff;
+  --preto-puro: #000000;
+  --cinza: #919191;
+  --marrom: #b39c79;
+  /*Fontes*/
+  --fonte-principal: "Poppins";
+  --fonte-secundaria: "Ancizar Serif";
+  --fonte-terciaria: "Playfair Display";
+}
+
+
+body {
+  margin: 0;
+  font-family: var(--fonte-principal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
