@@ -1,4 +1,5 @@
 import './Header.css';
+
 const Header = () => {
     return (
         <div className="header">
@@ -19,7 +20,5 @@ const Header = () => {
             </nav>
         </div>
     )
-
-
 }
 export default Header;

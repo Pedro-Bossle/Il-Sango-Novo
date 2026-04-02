@@ -1,11 +1,13 @@
 import Layout from './components/Layout/Layout';
-import Banner from './components/Banner/Banner'
+import Banner from './components/Banner/Banner';
+import Card from './components/Card/Card';
 
 function App() {
   return (
     <Layout>
       <div className="App">
         <Banner></Banner>
+        <Card></Card>
 
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse placerat mi ac vestibulum tincidunt. Donec volutpat tellus a nisl viverra dictum. Maecenas nisl ligula, euismod at interdum id, imperdiet sit amet neque. Donec nec enim erat. Integer eleifend leo et rutrum blandit. Vestibulum tincidunt dui at luctus consectetur. Mauris ullamcorper dapibus congue. Duis tempus elit sed nibh porta, sed mollis dolor rutrum. Quisque gravida at odio quis posuere. Cras aliquam risus mauris, sed sollicitudin quam scelerisque sed. Ut vel ultrices lacus, sit amet congue velit. Integer egestas libero sed laoreet porta. Maecenas sit amet sapien mattis, aliquam augue a, sollicitudin turpis. Vestibulum fermentum tempor eros. Vivamus id tincidunt velit.
           In ac odio consectetur, finibus diam eu, lobortis ante. Duis varius iaculis enim vestibulum blandit. Ut lacinia neque in rutrum tempor. Nulla volutpat sit amet orci ut ultrices. Sed vehicula urna mi, vitae facilisis arcu sagittis ac. Quisque convallis dictum sagittis. Sed tempor accumsan lectus. Integer nec viverra quam. Morbi varius ornare dignissim.
