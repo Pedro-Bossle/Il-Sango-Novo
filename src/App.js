@@ -4,6 +4,7 @@ import 'lenis/dist/lenis.css';
 import Layout from './components/Layout/Layout';
 import Banner from './components/Banner/Banner';
 import About from './components/About/About';
+
 function App() {
   const lenisRef = useRef(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
