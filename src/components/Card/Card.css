@@ -1,0 +1,61 @@
+.card-section {
+    display: flex;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--marrom);
+    border-radius: 8px;
+    padding: 2em 3em;
+    margin: 2em;
+    width: 30vw;
+}
+
+.card-titulo-container {
+    display: flex;
+    gap: 1em;
+    text-align: left;
+}
+
+.card-foto {
+    border-radius: 360px;
+    min-height: 100px;
+    height: 12vh;
+}
+
+.card-historia {
+    text-align: left;
+}
+
+.tiago {
+    transition: box-shadow 0.55s ease;
+}
+
+.tiago:hover {
+    border: 1px solid var(--bordo);
+    box-shadow:
+        0 8px 32px rgba(83, 5, 5, 0.363),
+        0 2px 12px rgba(0, 0, 0, 0.137);
+}
+
+.rosangela {
+    transition: box-shadow 0.55s ease;
+}
+
+.rosangela:hover {
+    border: 1px solid var(--amarelo-dourado);
+    box-shadow:
+        0 8px 32px rgba(110, 77, 6, 0.342),
+        0 2px 12px rgba(0, 0, 0, 0.137);
+}
+
+
+/*
+card-section
+    card
+        card-titulo-container
+            card-foto
+            card-nome
+            card-sub
+        card-historia*/
