@@ -10,6 +10,7 @@
     padding: 2em 3em;
     margin: 2em;
     width: 30vw;
+    background-color: var(--branco-puro);
 }
 
 .card-titulo-container {

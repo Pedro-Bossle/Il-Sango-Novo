@@ -1,0 +1,39 @@
+.botao_wpp {
+  position: fixed;
+  right: 2.5rem;
+  z-index: 9999;
+  cursor: pointer;
+  transition: bottom 0.2s ease;
+}
+
+.botao_wpp--low {
+  bottom: 1.75rem;
+}
+
+.botao_wpp--with-scroll-top {
+  bottom: 6.99rem;
+}
+
+.botao_wpp_ico {
+  width: 70px;
+  height: 70px;
+}
+
+@media (max-width: 768px) {
+  .botao_wpp {
+    right: 1.25rem;
+  }
+
+  .botao_wpp--low {
+    bottom: 1rem;
+  }
+
+  .botao_wpp--with-scroll-top {
+    bottom: 5.75rem;
+  }
+
+  .botao_wpp_ico {
+    width: 60px;
+    height: 60px;
+  }
+}

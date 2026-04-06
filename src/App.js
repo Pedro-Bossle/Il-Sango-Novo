@@ -4,6 +4,7 @@ import 'lenis/dist/lenis.css';
 import Layout from './components/Layout/Layout';
 import Banner from './components/Banner/Banner';
 import About from './components/About/About';
+import Eventos from './components/Eventos/Eventos';
 
 function App() {
   const lenisRef = useRef(null);
@@ -31,10 +32,11 @@ function App() {
     lenisRef.current?.scrollTo(0, { duration: 1.2 });
   }, []);
   return (
-    <Layout>
+    <Layout showScrollTop={showScrollTop} onScrollTop={scrollToTop}>
       <div className="App">
         <Banner />
         <About />
+        <Eventos />
         <p>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse placerat mi ac
           vestibulum tincidunt. Donec volutpat tellus a nisl viverra dictum. Maecenas nisl ligula,
@@ -96,29 +98,7 @@ function App() {
           Donec a suscipit massa. Donec vitae vehicula magna. Ut lacinia lorem non arcu gravida, eget
           scelerisque turpis lacinia. In ultricies metus ac iaculis pharetra.
         </p>
-        {showScrollTop && (
-          <button
-            type="button"
-            onClick={scrollToTop}
-            aria-label="Voltar ao topo"
-            style={{
-              position: 'fixed',
-              right: '2.99rem',
-              bottom: '2.99rem',
-              zIndex: 9999,
-              padding: '1rem 1.5rem',
-              cursor: 'pointer',
-              borderRadius: '360px',
-              border: '1px solid var(--bordo, #530505)',
-              background: 'var(--bordo, #530505)',
-              color: 'var(--branco-puro, #fff)',
-              fontSize: '0.9rem',
-              fontSize: '20px',
-            }}
-          >
-            ↑
-          </button>
-        )}
+
       </div>
     </Layout>
   );

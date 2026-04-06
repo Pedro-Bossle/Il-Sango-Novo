@@ -12,7 +12,9 @@ const Card = () => {
                         <h5 className="card-sub">X Anos de Experiência</h5>
                     </div>
                 </div>
-                <p className="card-historia">Iniciado por XX na tradição X em X, feito Mestre de Quimbanda Malei pelo feitor X da casa X (Outras informações caso queiram)</p>
+                <p className="card-historia">Iniciado por XX na tradição X em X, feito Mestre de Quimbanda Malei pelo feitor X da casa X (Outras informações caso queiram)Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse placerat mi ac
+                    vestibulum tincidunt. Donec volutpat tellus a nisl viverra dictum. Maecenas nisl ligula,
+                    euismod at interdum id, imperdiet sit amet neque.</p>
             </div>
 
             <div className="card rosangela">
@@ -23,7 +25,9 @@ const Card = () => {
                         <h5 className="card-sub">X Anos de Experiência</h5>
                     </div>
                 </div>
-                <p className="card-historia">Iniciado por XX na tradição X em X, feito Mestre de Quimbanda Malei pelo feitor X da casa X (Outras informações caso queiram)</p>
+                <p className="card-historia">Iniciado por XX na tradição X em X, feito Mestre de Quimbanda Malei pelo feitor X da casa X (Outras informações caso queiram)Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse placerat mi ac
+                    vestibulum tincidunt. Donec volutpat tellus a nisl viverra dictum. Maecenas nisl ligula,
+                    euismod at interdum id, imperdiet sit amet neque.</p>
             </div>
         </div>
     )
