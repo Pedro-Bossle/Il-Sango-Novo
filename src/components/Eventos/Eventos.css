@@ -1,0 +1,50 @@
+.evento-section {
+    text-align: center;
+    background-color: var(--branco-puro);
+    padding: 2em 6em;
+}
+
+.evento-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.evento-card {
+    text-align: left;
+    border: 1px solid var(--bordo);
+    border-radius: 8px;
+    margin: 1em;
+    padding: 1em 2em;
+}
+
+.evento-card-name-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.evento-card-ico {
+    width: 30px;
+}
+
+.evento-card-local,
+.evento-card-hora {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+
+.evento-card-name {
+    color: var(--preto-puro);
+}
+
+
+
+/*
+evento-card-name
+evento-card-data
+evento-card-descricao
+evento-card-local
+evento-card-hora
+ico-text*/

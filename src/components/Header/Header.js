@@ -11,11 +11,11 @@ const Header = () => {
                 </div>
             </div>
             <nav className='header-nav'>
-                <a className="header-menu" href='https://youtube.com'>Início</a>
-                <a className="header-menu" href='https://youtube.com'>Sobre Nós</a>
-                <a className="header-menu" href='https://youtube.com'>Calendário</a>
-                <a className="header-menu" href='https://youtube.com'>Catálogo</a>
-                <a className="header-menu" href='https://youtube.com'>Contato</a>
+                <a className="header-menu" href="#inicio">Início</a>
+                <a className="header-menu" href="#about">Sobre Nós</a>
+                <a className="header-menu" href="#eventos">Calendário</a>
+                <a className="header-menu" href="#shop">Catálogo</a>
+                <a className="header-menu" href="#footer">Contato</a>
                 <a className="header-menu login-button" href='https://youtube.com'><img className='button_icon' src="/images/icons/user-icon.png" alt=''/> Área Restrita</a>
             </nav>
         </div>
