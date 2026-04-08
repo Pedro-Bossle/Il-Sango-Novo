@@ -7,7 +7,19 @@ const MENUS = ['visao-geral', 'eventos', 'catalogo', 'membros', 'cobrancas'];
 
 const defaultEvento = { id: null, nome: '', data: '', hora: '', local: '', descricao: '' };
 const defaultCatalogo = { id: null, nome: '', categoria: '', valor: '', descricao: '', variacoes: '' };
-const defaultMembro = { id: null, nome: '', iniciacao: '', contato: '', orixas: '', obs: '' };
+const defaultMembro = {
+  id: null,
+  nome: '',
+  iniciacao: '',
+  contato: '',
+  ori: '',
+  corpo: '',
+  passagem: '',
+  ori_reza: '',
+  corpo_reza: '',
+  passagem_reza: '',
+  obs: '',
+};
 const defaultCobranca = { valor: '', vencimento: '', descricao: '' };
 
 const Dashboard = () => {
@@ -26,6 +38,7 @@ const Dashboard = () => {
   const [buscaCobrancas, setBuscaCobrancas] = useState('');
   const [filtroLocal, setFiltroLocal] = useState('todos');
   const [filtroCategoria, setFiltroCategoria] = useState('todas');
+  const [filtroOri, setFiltroOri] = useState('todos');
   const [eventoForm, setEventoForm] = useState(defaultEvento);
   const [catalogoForm, setCatalogoForm] = useState(defaultCatalogo);
   const [membroForm, setMembroForm] = useState(defaultMembro);
@@ -43,7 +56,7 @@ const Dashboard = () => {
       supabase.auth.getSession(),
       supabase.from('eventos').select('id, nome, data, hora, local, descricao').order('data', { ascending: true }),
       supabase.from('catalogo').select('id, nome, categoria, valor, descricao, variacoes').order('id', { ascending: true }),
-      supabase.from('membros').select('id, nome, iniciacao, contato, orixas, obs').order('nome', { ascending: true }),
+      supabase.from('membros').select('id, nome, iniciacao, contato, ori, corpo, passagem, ori_reza, corpo_reza, passagem_reza, obs').order('nome', { ascending: true }),
       supabase.from('cobrancas').select('id, valor, vencimento, membro, membro_id, descricao').order('vencimento', { ascending: true }),
     ]);
 
@@ -88,6 +101,7 @@ const Dashboard = () => {
   const eventosProximos = useMemo(() => eventos.slice(0, 3), [eventos]);
   const locais = useMemo(() => [...new Set(eventos.map((e) => e.local).filter(Boolean))], [eventos]);
   const categorias = useMemo(() => [...new Set(catalogo.map((c) => c.categoria).filter(Boolean))], [catalogo]);
+  const oris = useMemo(() => [...new Set(membros.map((m) => m.ori).filter(Boolean))], [membros]);
 
   const eventosFiltrados = useMemo(() => eventos.filter((e) => {
     const txt = `${e.nome} ${e.local ?? ''} ${e.descricao ?? ''}`.toLowerCase();
@@ -104,10 +118,11 @@ const Dashboard = () => {
   }), [catalogo, buscaCatalogo, filtroCategoria]);
 
   const membrosFiltrados = useMemo(() => membros.filter((m) => {
-    const orixasTxt = Array.isArray(m.orixas) ? m.orixas.join(', ') : (m.orixas ?? '');
-    const txt = `${m.nome} ${m.contato ?? ''} ${orixasTxt} ${m.obs ?? ''}`.toLowerCase();
-    return txt.includes(buscaMembros.toLowerCase().trim());
-  }), [membros, buscaMembros]);
+    const txt = `${m.nome} ${m.contato ?? ''} ${m.ori ?? ''} ${m.corpo ?? ''} ${m.passagem ?? ''} ${m.obs ?? ''}`.toLowerCase();
+    const bateBusca = txt.includes(buscaMembros.toLowerCase().trim());
+    const bateOri = filtroOri === 'todos' || m.ori === filtroOri;
+    return bateBusca && bateOri;
+  }), [membros, buscaMembros, filtroOri]);
 
   const cobrancasComMembro = useMemo(() => {
     const mapaMembros = new Map(membros.map((m) => [String(m.id), m.nome]));
@@ -180,15 +195,16 @@ const Dashboard = () => {
 
   const salvarMembro = async (e) => {
     e.preventDefault();
-    const orixasArray = membroForm.orixas
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
     const payload = {
       nome: membroForm.nome,
       iniciacao: membroForm.iniciacao || null,
       contato: membroForm.contato,
-      orixas: orixasArray,
+      ori: membroForm.ori,
+      corpo: membroForm.corpo,
+      passagem: membroForm.passagem,
+      ori_reza: membroForm.ori_reza,
+      corpo_reza: membroForm.corpo_reza,
+      passagem_reza: membroForm.passagem_reza,
       obs: membroForm.obs,
     };
     const { error: saveError } = membroForm.id
@@ -243,8 +259,13 @@ const Dashboard = () => {
       ...m,
       iniciacao: m.iniciacao || '',
       contato: m.contato || '',
+      ori: m.ori || '',
+      corpo: m.corpo || '',
+      passagem: m.passagem || '',
+      ori_reza: m.ori_reza || '',
+      corpo_reza: m.corpo_reza || '',
+      passagem_reza: m.passagem_reza || '',
       obs: m.obs || '',
-      orixas: Array.isArray(m.orixas) ? m.orixas.join(', ') : (m.orixas || ''),
     });
     setCobrancaForm(defaultCobranca);
     setMostrarModalMembro(true);
@@ -258,6 +279,22 @@ const Dashboard = () => {
   const abrirEdicaoCatalogo = (item) => {
     setCatalogoForm({ ...defaultCatalogo, ...item });
     setMostrarModalCatalogo(true);
+  };
+
+  const abrirAdicaoEvento = () => {
+    setEventoForm(defaultEvento);
+    setMostrarModalEvento(true);
+  };
+
+  const abrirAdicaoCatalogo = () => {
+    setCatalogoForm(defaultCatalogo);
+    setMostrarModalCatalogo(true);
+  };
+
+  const abrirAdicaoMembro = () => {
+    setMembroForm(defaultMembro);
+    setCobrancaForm(defaultCobranca);
+    setMostrarModalMembro(true);
   };
 
   const cobrancasDoMembro = useMemo(() => {
@@ -319,16 +356,18 @@ const Dashboard = () => {
         {menuAtivo === 'eventos' && (
           <>
             <h1>Eventos</h1>
-            <form className="dash-form" onSubmit={salvarEvento}>
-              <input placeholder="Nome" value={eventoForm.nome} onChange={(e) => setEventoForm({ ...eventoForm, nome: e.target.value })} required />
-              <input type="date" value={eventoForm.data} onChange={(e) => setEventoForm({ ...eventoForm, data: e.target.value })} required />
-              <input type="time" value={eventoForm.hora} onChange={(e) => setEventoForm({ ...eventoForm, hora: e.target.value })} required />
-              <input placeholder="Local" value={eventoForm.local} onChange={(e) => setEventoForm({ ...eventoForm, local: e.target.value })} required />
-              <input placeholder="Descricao" value={eventoForm.descricao} onChange={(e) => setEventoForm({ ...eventoForm, descricao: e.target.value })} />
-              <button type="submit">{eventoForm.id ? 'Atualizar evento' : 'Adicionar evento'}</button>
-            </form>
+            <div className="dash-section-header">
+              <div className="dash-filtros">
+                <input placeholder="Pesquisar evento" value={buscaEventos} onChange={(e) => setBuscaEventos(e.target.value)} />
+                <select value={filtroLocal} onChange={(e) => setFiltroLocal(e.target.value)}>
+                  <option value="todos">Todos os locais</option>
+                  {locais.map((l) => <option key={l} value={l}>{l}</option>)}
+                </select>
+              </div>
+              <button className="dash-add-button" onClick={abrirAdicaoEvento}>Adicionar evento</button>
+            </div>
 
-            <div className="dash-filtros">
+            <div className="dash-filtros-mobile">
               <input placeholder="Pesquisar evento" value={buscaEventos} onChange={(e) => setBuscaEventos(e.target.value)} />
               <select value={filtroLocal} onChange={(e) => setFiltroLocal(e.target.value)}>
                 <option value="todos">Todos os locais</option>
@@ -356,16 +395,18 @@ const Dashboard = () => {
         {menuAtivo === 'catalogo' && (
           <>
             <h1>Catalogo</h1>
-            <form className="dash-form" onSubmit={salvarCatalogo}>
-              <input placeholder="Nome" value={catalogoForm.nome} onChange={(e) => setCatalogoForm({ ...catalogoForm, nome: e.target.value })} required />
-              <input placeholder="Categoria" value={catalogoForm.categoria} onChange={(e) => setCatalogoForm({ ...catalogoForm, categoria: e.target.value })} required />
-              <input placeholder="Valor" value={catalogoForm.valor} onChange={(e) => setCatalogoForm({ ...catalogoForm, valor: e.target.value })} required />
-              <input placeholder="Descricao" value={catalogoForm.descricao} onChange={(e) => setCatalogoForm({ ...catalogoForm, descricao: e.target.value })} />
-              <input placeholder="Variacoes (separe por virgula)" value={catalogoForm.variacoes} onChange={(e) => setCatalogoForm({ ...catalogoForm, variacoes: e.target.value })} />
-              <button type="submit">{catalogoForm.id ? 'Atualizar item' : 'Adicionar item'}</button>
-            </form>
+            <div className="dash-section-header">
+              <div className="dash-filtros">
+                <input placeholder="Pesquisar item" value={buscaCatalogo} onChange={(e) => setBuscaCatalogo(e.target.value)} />
+                <select value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}>
+                  <option value="todas">Todas as categorias</option>
+                  {categorias.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <button className="dash-add-button" onClick={abrirAdicaoCatalogo}>Adicionar item</button>
+            </div>
 
-            <div className="dash-filtros">
+            <div className="dash-filtros-mobile">
               <input placeholder="Pesquisar item" value={buscaCatalogo} onChange={(e) => setBuscaCatalogo(e.target.value)} />
               <select value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}>
                 <option value="todas">Todas as categorias</option>
@@ -394,17 +435,23 @@ const Dashboard = () => {
         {menuAtivo === 'membros' && (
           <>
             <h1>Membros</h1>
-            <form className="dash-form" onSubmit={salvarMembro}>
-              <input placeholder="Nome" value={membroForm.nome} onChange={(e) => setMembroForm({ ...membroForm, nome: e.target.value })} required />
-              <input type="date" title="Data de iniciacao" aria-label="Data de iniciacao" value={membroForm.iniciacao} onChange={(e) => setMembroForm({ ...membroForm, iniciacao: e.target.value })} />
-              <input placeholder="Contato" value={membroForm.contato} onChange={(e) => setMembroForm({ ...membroForm, contato: e.target.value })} />
-              <input placeholder="Orixas (separe por virgula)" value={membroForm.orixas} onChange={(e) => setMembroForm({ ...membroForm, orixas: e.target.value })} />
-              <input placeholder="Observacoes" value={membroForm.obs} onChange={(e) => setMembroForm({ ...membroForm, obs: e.target.value })} />
-              <button type="submit">{membroForm.id ? 'Atualizar membro' : 'Adicionar membro'}</button>
-            </form>
+            <div className="dash-section-header">
+              <div className="dash-filtros">
+                <input placeholder="Pesquisar membro" value={buscaMembros} onChange={(e) => setBuscaMembros(e.target.value)} />
+                <select value={filtroOri} onChange={(e) => setFiltroOri(e.target.value)}>
+                  <option value="todos">Todos os Ori</option>
+                  {oris.map((ori) => <option key={ori} value={ori}>{ori}</option>)}
+                </select>
+              </div>
+              <button className="dash-add-button" onClick={abrirAdicaoMembro}>Adicionar membro</button>
+            </div>
 
-            <div className="dash-filtros">
+            <div className="dash-filtros-mobile">
               <input placeholder="Pesquisar membro" value={buscaMembros} onChange={(e) => setBuscaMembros(e.target.value)} />
+              <select value={filtroOri} onChange={(e) => setFiltroOri(e.target.value)}>
+                <option value="todos">Todos os Ori</option>
+                {oris.map((ori) => <option key={ori} value={ori}>{ori}</option>)}
+              </select>
             </div>
 
             <div className="dash-grid-3">
@@ -413,7 +460,9 @@ const Dashboard = () => {
                   <h3>{m.nome}</h3>
                   <p>Iniciacao: {m.iniciacao || '-'}</p>
                   <p>Contato: {m.contato || '-'}</p>
-                  <p>Orixas: {Array.isArray(m.orixas) ? m.orixas.join(', ') : (m.orixas || '-')}</p>
+                  <p>Ori: {m.ori || '-'}</p>
+                  <p>Corpo: {m.corpo || '-'}</p>
+                  <p>Passagem: {m.passagem || '-'}</p>
                   <p>{m.obs}</p>
                   <div className="dash-actions">
                     <button onClick={() => abrirEdicaoMembro(m)}>Editar</button>
@@ -455,7 +504,7 @@ const Dashboard = () => {
       {mostrarModalEvento && (
         <div className="dash-modal-overlay">
           <div className="dash-modal" ref={modalRef}>
-            <h2>Editar evento</h2>
+            <h2>{eventoForm.id ? 'Editar evento' : 'Adicionar evento'}</h2>
             <form className="dash-form" onSubmit={salvarEvento}>
               <input placeholder="Nome" value={eventoForm.nome} onChange={(e) => setEventoForm({ ...eventoForm, nome: e.target.value })} required />
               <input type="date" value={eventoForm.data} onChange={(e) => setEventoForm({ ...eventoForm, data: e.target.value })} required />
@@ -472,7 +521,7 @@ const Dashboard = () => {
       {mostrarModalCatalogo && (
         <div className="dash-modal-overlay">
           <div className="dash-modal" ref={modalRef}>
-            <h2>Editar item do catalogo</h2>
+            <h2>{catalogoForm.id ? 'Editar item do catalogo' : 'Adicionar item ao catalogo'}</h2>
             <form className="dash-form" onSubmit={salvarCatalogo}>
               <input placeholder="Nome" value={catalogoForm.nome} onChange={(e) => setCatalogoForm({ ...catalogoForm, nome: e.target.value })} required />
               <input placeholder="Categoria" value={catalogoForm.categoria} onChange={(e) => setCatalogoForm({ ...catalogoForm, categoria: e.target.value })} required />
@@ -489,59 +538,68 @@ const Dashboard = () => {
       {mostrarModalMembro && (
         <div className="dash-modal-overlay">
           <div className="dash-modal" ref={modalRef}>
-            <h2>Editar membro</h2>
+            <h2>{membroForm.id ? 'Editar membro' : 'Adicionar membro'}</h2>
             <form className="dash-form" onSubmit={salvarMembro}>
               <input placeholder="Nome" value={membroForm.nome} onChange={(e) => setMembroForm({ ...membroForm, nome: e.target.value })} required />
               <input type="date" title="Data de iniciacao" aria-label="Data de iniciacao" value={membroForm.iniciacao} onChange={(e) => setMembroForm({ ...membroForm, iniciacao: e.target.value })} />
               <input placeholder="Contato" value={membroForm.contato} onChange={(e) => setMembroForm({ ...membroForm, contato: e.target.value })} />
-              <input placeholder="Orixas (separe por virgula)" value={membroForm.orixas} onChange={(e) => setMembroForm({ ...membroForm, orixas: e.target.value })} />
+              <input placeholder="Ori" value={membroForm.ori} onChange={(e) => setMembroForm({ ...membroForm, ori: e.target.value })} />
+              <input placeholder="Corpo" value={membroForm.corpo} onChange={(e) => setMembroForm({ ...membroForm, corpo: e.target.value })} />
+              <input placeholder="Passagem" value={membroForm.passagem} onChange={(e) => setMembroForm({ ...membroForm, passagem: e.target.value })} />
+              <textarea placeholder="Ori - Reza" value={membroForm.ori_reza} onChange={(e) => setMembroForm({ ...membroForm, ori_reza: e.target.value })} />
+              <textarea placeholder="Corpo - Reza" value={membroForm.corpo_reza} onChange={(e) => setMembroForm({ ...membroForm, corpo_reza: e.target.value })} />
+              <textarea placeholder="Passagem - Reza" value={membroForm.passagem_reza} onChange={(e) => setMembroForm({ ...membroForm, passagem_reza: e.target.value })} />
               <input placeholder="Observacoes" value={membroForm.obs} onChange={(e) => setMembroForm({ ...membroForm, obs: e.target.value })} />
               <button type="submit">Salvar membro</button>
             </form>
 
-            <h3>Cobrancas do membro</h3>
-            <form className="dash-form" onSubmit={salvarCobranca}>
-              <input
-                type="number"
-                step="0.01"
-                placeholder="Valor da cobranca"
-                value={cobrancaForm.valor}
-                onChange={(e) => setCobrancaForm({ ...cobrancaForm, valor: e.target.value })}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Descricao da cobranca"
-                value={cobrancaForm.descricao}
-                onChange={(e) => setCobrancaForm({ ...cobrancaForm, descricao: e.target.value })}
-                required
-              />
-              <input
-                type="date"
-                title="Data de vencimento"
-                aria-label="Data de vencimento"
-                value={cobrancaForm.vencimento}
-                onChange={(e) => setCobrancaForm({ ...cobrancaForm, vencimento: e.target.value })}
-                required
-              />
-              <button type="submit">Adicionar cobranca</button>
-            </form>
+            {membroForm.id && (
+              <>
+                <h3>Cobrancas do membro</h3>
+                <form className="dash-form" onSubmit={salvarCobranca}>
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="Valor da cobranca"
+                    value={cobrancaForm.valor}
+                    onChange={(e) => setCobrancaForm({ ...cobrancaForm, valor: e.target.value })}
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Descricao da cobranca"
+                    value={cobrancaForm.descricao}
+                    onChange={(e) => setCobrancaForm({ ...cobrancaForm, descricao: e.target.value })}
+                    required
+                  />
+                  <input
+                    type="date"
+                    title="Data de vencimento"
+                    aria-label="Data de vencimento"
+                    value={cobrancaForm.vencimento}
+                    onChange={(e) => setCobrancaForm({ ...cobrancaForm, vencimento: e.target.value })}
+                    required
+                  />
+                  <button type="submit">Adicionar cobranca</button>
+                </form>
 
-            <div className="dash-grid-3">
-              {cobrancasDoMembro.map((c) => (
-                <article className="dash-card" key={`${c.id}-${c.vencimento}`}>
-                  <span className={`dash-status ${getStatusCobranca(c.vencimento).className}`}>
-                    {getStatusCobranca(c.vencimento).label}
-                  </span>
-                  <p><strong>Descricao:</strong> {c.descricao || '-'}</p>
-                  <p><strong>Valor:</strong> R$ {c.valor}</p>
-                  <p><strong>Vencimento:</strong> {c.vencimento || '-'}</p>
-                  <div className="dash-actions">
-                    <button onClick={() => deletarRegistro('cobrancas', c.id)}>Excluir cobranca</button>
-                  </div>
-                </article>
-              ))}
-            </div>
+                <div className="dash-grid-3">
+                  {cobrancasDoMembro.map((c) => (
+                    <article className="dash-card" key={`${c.id}-${c.vencimento}`}>
+                      <span className={`dash-status ${getStatusCobranca(c.vencimento).className}`}>
+                        {getStatusCobranca(c.vencimento).label}
+                      </span>
+                      <p><strong>Descricao:</strong> {c.descricao || '-'}</p>
+                      <p><strong>Valor:</strong> R$ {c.valor}</p>
+                      <p><strong>Vencimento:</strong> {c.vencimento || '-'}</p>
+                      <div className="dash-actions">
+                        <button onClick={() => deletarRegistro('cobrancas', c.id)}>Excluir cobranca</button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
 
             <button className="dash-close" onClick={() => setMostrarModalMembro(false)}>Fechar</button>
           </div>
