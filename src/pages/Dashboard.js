@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import './Dashboard.css';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const MENUS = ['visao-geral', 'eventos', 'catalogo', 'membros', 'cobrancas'];
 
@@ -35,7 +35,7 @@ const Dashboard = () => {
   const [cobrancaForm, setCobrancaForm] = useState(defaultCobranca);
   const modalRef = useRef(null);
 
-  const carregarDados = async () => {
+  const carregarDados = useCallback(async () => {
     setLoading(true);
     setError('');
 
@@ -61,11 +61,12 @@ const Dashboard = () => {
     setMembros(membrosData ?? []);
     setCobrancas(cobrancasData ?? []);
     setLoading(false);
-  };
+  }, [navigate]);
 
   useEffect(() => {
     carregarDados();
-  }, []);
+  }, [carregarDados]);
+
 
   useEffect(() => {
     const handleClickFora = (event) => {
