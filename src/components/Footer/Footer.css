@@ -120,6 +120,13 @@
     color: var(--branco-puro);
 }
 
+.footer__copyright-link {
+    font-style: italic;
+    text-align: center;
+    font-weight: 100;
+    color: var(--branco-puro);
+}
+
 .ul-copyright {
     display: flex;
     align-items: center;
