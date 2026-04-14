@@ -127,6 +127,13 @@
   flex: 1;
 }
 
+.dash-section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
 .dash-add-button {
   border: 1px solid var(--cinza);
   border-radius: 8px;
@@ -184,6 +191,10 @@
   align-items: center;
   z-index: 30;
   padding: 1rem;
+}
+
+.dash-modal-overlay--pagamento {
+  z-index: 9999;
 }
 
 .dash-modal {

@@ -77,7 +77,7 @@ export function CobrancaForm({ open, initial, onClose, onSave }: Props) {
 
   const filtradas = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return pessoas.slice(0, 80);
+    if (!q) return [];
     return pessoas.filter((p) => p.nome.toLowerCase().includes(q)).slice(0, 80);
   }, [pessoas, search]);
 
@@ -116,7 +116,7 @@ export function CobrancaForm({ open, initial, onClose, onSave }: Props) {
                   onFocus={() => setDropdownOpen(true)}
                   autoComplete="off"
                 />
-                {dropdownOpen && (
+                {dropdownOpen && search.trim() && (
                   <ul className="dash-search-select__list">
                     {filtradas.map((p) => (
                       <li key={p.id}>

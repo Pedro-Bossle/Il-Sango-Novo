@@ -27,6 +27,19 @@ export function CobrancasScreen() {
   const [editing, setEditing] = useState<CobrancaComMembro | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<CobrancaComMembro | null>(null);
   const [buscaMembro, setBuscaMembro] = useState('');
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkSaving, setBulkSaving] = useState(false);
+  const [bulkValues, setBulkValues] = useState<{
+    tipo: CobrancaFormValues['tipo'];
+    data: string;
+    valor: string;
+    descricao: string;
+  }>({
+    tipo: 'mensalidade',
+    data: '',
+    valor: '50.00',
+    descricao: '',
+  });
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -149,6 +162,51 @@ export function CobrancasScreen() {
     gerarPdfRelatorio(periodoAplicado, linhas, total);
   };
 
+  const abrirCobrancaEmMassa = () => {
+    setBulkOpen(true);
+  };
+
+  const criarCobrancaParaTodos = async () => {
+    const data = bulkValues.data.trim();
+    const valor = Number(bulkValues.valor);
+    if (!data) {
+      setToast({ msg: 'Informe o vencimento para cobrança em massa.', variant: 'error' });
+      return;
+    }
+    if (!Number.isFinite(valor) || valor <= 0) {
+      setToast({ msg: 'Informe um valor válido maior que zero.', variant: 'error' });
+      return;
+    }
+
+    setBulkSaving(true);
+    try {
+      const pessoas = await fetchPessoasOptions();
+      if (!pessoas.length) {
+        setToast({ msg: 'Não há membros para cobrar.', variant: 'error' });
+        return;
+      }
+
+      for (const p of pessoas) {
+        await insertCobranca({
+          pessoa_id: p.id,
+          membro_nome: p.nome,
+          valor,
+          data,
+          descricao: bulkValues.descricao.trim() || null,
+          tipo: bulkValues.tipo,
+        });
+      }
+
+      setToast({ msg: `Cobrança criada para ${pessoas.length} membro(s).`, variant: 'success' });
+      setBulkOpen(false);
+      await reload();
+    } catch (e) {
+      setToast({ msg: e instanceof Error ? e.message : 'Erro ao criar cobrança em massa.', variant: 'error' });
+    } finally {
+      setBulkSaving(false);
+    }
+  };
+
   return (
     <>
       <Toast message={toast?.msg ?? null} variant={toast?.variant} onDismiss={() => setToast(null)} />
@@ -211,9 +269,14 @@ export function CobrancasScreen() {
             ? `Pesquisa ativa por nome (“${buscaMembro.trim()}”).`
             : null}
         </p>
-        <button type="button" className="dash-add-button" onClick={openNovo}>
-          Nova cobrança
-        </button>
+        <div className="dash-section-actions">
+          <button type="button" className="dash-btn-secondary" onClick={abrirCobrancaEmMassa}>
+            Cobrar todos os membros
+          </button>
+          <button type="button" className="dash-add-button" onClick={openNovo}>
+            Nova cobrança
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -223,6 +286,54 @@ export function CobrancasScreen() {
       )}
 
       <CobrancaForm open={formOpen} initial={editing} onClose={() => setFormOpen(false)} onSave={salvar} />
+
+      {bulkOpen && (
+        <div className="dash-modal-overlay" role="dialog" aria-modal="true" onClick={() => setBulkOpen(false)}>
+          <div className="dash-modal dash-modal--narrow" onClick={(e) => e.stopPropagation()}>
+            <h2>Cobrança em massa</h2>
+            <p className="dash-muted">Cria uma cobrança para cada membro da casa.</p>
+            <div className="dash-member-form">
+              <label className="dash-field">
+                <span>Tipo</span>
+                <select
+                  value={bulkValues.tipo}
+                  onChange={(e) => setBulkValues((v) => ({ ...v, tipo: e.target.value as CobrancaFormValues['tipo'] }))}
+                >
+                  <option value="mensalidade">Mensalidade</option>
+                  <option value="obrigacao">Obrigação</option>
+                  <option value="outros">Outros</option>
+                </select>
+              </label>
+              <label className="dash-field">
+                <span>Vencimento</span>
+                <input type="date" value={bulkValues.data} onChange={(e) => setBulkValues((v) => ({ ...v, data: e.target.value }))} />
+              </label>
+              <label className="dash-field">
+                <span>Valor</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={bulkValues.valor}
+                  onChange={(e) => setBulkValues((v) => ({ ...v, valor: e.target.value }))}
+                />
+              </label>
+              <label className="dash-field">
+                <span>Descrição</span>
+                <textarea rows={3} value={bulkValues.descricao} onChange={(e) => setBulkValues((v) => ({ ...v, descricao: e.target.value }))} />
+              </label>
+            </div>
+            <div className="dash-form-actions">
+              <button type="button" className="dash-btn-secondary" onClick={() => setBulkOpen(false)} disabled={bulkSaving}>
+                Cancelar
+              </button>
+              <button type="button" className="dash-btn-primary" onClick={() => void criarCobrancaParaTodos()} disabled={bulkSaving}>
+                {bulkSaving ? 'Criando…' : 'Criar para todos'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {deleteTarget && (
         <div className="dash-modal-overlay" role="dialog" aria-modal="true">

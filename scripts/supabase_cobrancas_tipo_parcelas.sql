@@ -1,10 +1,10 @@
 -- =============================================================================
--- Cobranças: tipo, valor total/pago/saldo, histórico de pagamentos e mensalidades
+-- Cobranças: tipo, valor total/pago/saldo e histórico de pagamentos
 -- Alinhado ao app (pessoa_id uuid, membro texto, vencimento date, descricao).
 -- Executar no SQL Editor do Supabase (ajusta nomes se o teu schema diferir).
 -- =============================================================================
 
--- Extensões (cron é opcional; ativa no dashboard se ainda não estiver)
+-- Extensão para UUID em `cobranca_pagamentos.id`
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- 1) Novas colunas em cobrancas (não duplicar vencimento se já existir)
@@ -18,7 +18,7 @@ ALTER TABLE public.cobrancas
 ALTER TABLE public.cobrancas
   ADD COLUMN IF NOT EXISTS valor_pago NUMERIC(10, 2) DEFAULT 0;
 
--- created_at (útil para cron e listagens)
+-- created_at (útil para listagens)
 ALTER TABLE public.cobrancas
   ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
 
@@ -85,39 +85,5 @@ CREATE TRIGGER trg_update_valor_pago
   FOR EACH ROW
   EXECUTE PROCEDURE public.update_valor_pago();
 
--- 4) Mensalidades mensais (vencimento dia 20; valor de exemplo 50 — ajusta)
-CREATE OR REPLACE FUNCTION public.gerar_mensalidades_mensais()
-RETURNS void AS $$
-DECLARE
-  mes_nome TEXT;
-  venc DATE;
-BEGIN
-  mes_nome := TO_CHAR(NOW(), 'TMMonth/YYYY');
-  venc := (DATE_TRUNC('month', NOW())::DATE + INTERVAL '19 days')::DATE;
-
-  INSERT INTO public.cobrancas (pessoa_id, tipo, descricao, valor_total, valor_pago, vencimento, membro, created_at)
-  SELECT
-    p.id,
-    'mensalidade',
-    'Mensalidade (' || mes_nome || ')',
-    50.00,
-    0,
-    venc,
-    p.nome,
-    NOW()
-  FROM public.pessoas p
-  WHERE NOT EXISTS (
-    SELECT 1 FROM public.cobrancas c
-    WHERE c.pessoa_id = p.id
-      AND c.tipo = 'mensalidade'
-      AND DATE_TRUNC('month', c.vencimento) = DATE_TRUNC('month', NOW()::DATE)
-  );
-END;
-$$ LANGUAGE plpgsql;
-
--- 5) pg_cron (opcional — só se a extensão estiver ativa no projeto)
--- SELECT cron.schedule(
---   'gerar-mensalidades',
---   '0 9 5 * *',
---   $$SELECT public.gerar_mensalidades_mensais();$$
--- );
+-- 4) Remover função de geração automática (fluxo agora é manual/em massa no app)
+DROP FUNCTION IF EXISTS public.gerar_mensalidades_mensais();

@@ -54,10 +54,12 @@ CREATE POLICY pessoas_delete_authenticated ON public.pessoas FOR DELETE TO authe
 -- eventos
 ALTER TABLE public.eventos ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS eventos_select_authenticated ON public.eventos;
+DROP POLICY IF EXISTS eventos_select_anon ON public.eventos;
 DROP POLICY IF EXISTS eventos_insert_authenticated ON public.eventos;
 DROP POLICY IF EXISTS eventos_update_authenticated ON public.eventos;
 DROP POLICY IF EXISTS eventos_delete_authenticated ON public.eventos;
 CREATE POLICY eventos_select_authenticated ON public.eventos FOR SELECT TO authenticated USING (true);
+CREATE POLICY eventos_select_anon ON public.eventos FOR SELECT TO anon USING (true);
 CREATE POLICY eventos_insert_authenticated ON public.eventos FOR INSERT TO authenticated WITH CHECK (true);
 CREATE POLICY eventos_update_authenticated ON public.eventos FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY eventos_delete_authenticated ON public.eventos FOR DELETE TO authenticated USING (true);
@@ -65,10 +67,12 @@ CREATE POLICY eventos_delete_authenticated ON public.eventos FOR DELETE TO authe
 -- catalogo
 ALTER TABLE public.catalogo ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS catalogo_select_authenticated ON public.catalogo;
+DROP POLICY IF EXISTS catalogo_select_anon ON public.catalogo;
 DROP POLICY IF EXISTS catalogo_insert_authenticated ON public.catalogo;
 DROP POLICY IF EXISTS catalogo_update_authenticated ON public.catalogo;
 DROP POLICY IF EXISTS catalogo_delete_authenticated ON public.catalogo;
 CREATE POLICY catalogo_select_authenticated ON public.catalogo FOR SELECT TO authenticated USING (true);
+CREATE POLICY catalogo_select_anon ON public.catalogo FOR SELECT TO anon USING (true);
 CREATE POLICY catalogo_insert_authenticated ON public.catalogo FOR INSERT TO authenticated WITH CHECK (true);
 CREATE POLICY catalogo_update_authenticated ON public.catalogo FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY catalogo_delete_authenticated ON public.catalogo FOR DELETE TO authenticated USING (true);
@@ -163,3 +167,5 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   public.orumale,
   public.exus
 TO authenticated;
+
+GRANT SELECT ON public.eventos, public.catalogo TO anon;

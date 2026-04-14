@@ -5,7 +5,7 @@
 -- =============================================================================
 
 -- ---------------------------------------------------------------------------
--- A) Extensão e colunas/tabelas de cobranças (tipo, parcelas, mensalidades)
+-- A) Extensão e colunas/tabelas de cobranças (tipo, parcelas, sem auto-geração mensal)
 -- ---------------------------------------------------------------------------
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
@@ -76,37 +76,8 @@ CREATE TRIGGER trg_update_valor_pago
   FOR EACH ROW
   EXECUTE PROCEDURE public.update_valor_pago();
 
-CREATE OR REPLACE FUNCTION public.gerar_mensalidades_mensais()
-RETURNS void AS $$
-DECLARE
-  mes_nome TEXT;
-  venc DATE;
-BEGIN
-  mes_nome := TO_CHAR(NOW(), 'TMMonth/YYYY');
-  venc := (DATE_TRUNC('month', NOW())::DATE + INTERVAL '19 days')::DATE;
-
-  INSERT INTO public.cobrancas (pessoa_id, tipo, descricao, valor_total, valor_pago, vencimento, membro, created_at)
-  SELECT
-    p.id,
-    'mensalidade',
-    'Mensalidade (' || mes_nome || ')',
-    50.00,
-    0,
-    venc,
-    p.nome,
-    NOW()
-  FROM public.pessoas p
-  WHERE NOT EXISTS (
-    SELECT 1 FROM public.cobrancas c
-    WHERE c.pessoa_id = p.id
-      AND c.tipo = 'mensalidade'
-      AND DATE_TRUNC('month', c.vencimento) = DATE_TRUNC('month', NOW()::DATE)
-  );
-END;
-$$ LANGUAGE plpgsql;
-
--- pg_cron opcional: dia 5 às 09:00 UTC
--- SELECT cron.schedule('gerar-mensalidades', '0 9 5 * *', $$SELECT public.gerar_mensalidades_mensais();$$);
+-- Sem geração automática mensal: usamos criação manual/em massa no app.
+DROP FUNCTION IF EXISTS public.gerar_mensalidades_mensais();
 
 -- ---------------------------------------------------------------------------
 -- B) Remover UNIQUE legado em cobrancas.membro (várias cobranças por pessoa)
@@ -158,20 +129,24 @@ CREATE POLICY pessoas_delete_authenticated ON public.pessoas FOR DELETE TO authe
 
 ALTER TABLE public.eventos ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS eventos_select_authenticated ON public.eventos;
+DROP POLICY IF EXISTS eventos_select_anon ON public.eventos;
 DROP POLICY IF EXISTS eventos_insert_authenticated ON public.eventos;
 DROP POLICY IF EXISTS eventos_update_authenticated ON public.eventos;
 DROP POLICY IF EXISTS eventos_delete_authenticated ON public.eventos;
 CREATE POLICY eventos_select_authenticated ON public.eventos FOR SELECT TO authenticated USING (true);
+CREATE POLICY eventos_select_anon ON public.eventos FOR SELECT TO anon USING (true);
 CREATE POLICY eventos_insert_authenticated ON public.eventos FOR INSERT TO authenticated WITH CHECK (true);
 CREATE POLICY eventos_update_authenticated ON public.eventos FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY eventos_delete_authenticated ON public.eventos FOR DELETE TO authenticated USING (true);
 
 ALTER TABLE public.catalogo ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS catalogo_select_authenticated ON public.catalogo;
+DROP POLICY IF EXISTS catalogo_select_anon ON public.catalogo;
 DROP POLICY IF EXISTS catalogo_insert_authenticated ON public.catalogo;
 DROP POLICY IF EXISTS catalogo_update_authenticated ON public.catalogo;
 DROP POLICY IF EXISTS catalogo_delete_authenticated ON public.catalogo;
 CREATE POLICY catalogo_select_authenticated ON public.catalogo FOR SELECT TO authenticated USING (true);
+CREATE POLICY catalogo_select_anon ON public.catalogo FOR SELECT TO anon USING (true);
 CREATE POLICY catalogo_insert_authenticated ON public.catalogo FOR INSERT TO authenticated WITH CHECK (true);
 CREATE POLICY catalogo_update_authenticated ON public.catalogo FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY catalogo_delete_authenticated ON public.catalogo FOR DELETE TO authenticated USING (true);
@@ -258,3 +233,5 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   public.orumale,
   public.exus
 TO authenticated;
+
+GRANT SELECT ON public.eventos, public.catalogo TO anon;

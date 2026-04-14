@@ -59,7 +59,7 @@ export function RegistrarPagamentoModal({ open, cobranca, onClose, onSaved }: Pr
   };
 
   return (
-    <div className="dash-modal-overlay" role="dialog" aria-modal="true" onClick={onClose}>
+    <div className="dash-modal-overlay dash-modal-overlay--pagamento" role="dialog" aria-modal="true" onClick={onClose}>
       <div className="dash-modal dash-modal--narrow" onClick={(e) => e.stopPropagation()}>
         <h2>Registrar pagamento</h2>
         <p className="dash-muted">
