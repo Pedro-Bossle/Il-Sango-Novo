@@ -33,7 +33,9 @@ body,
 #root {
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  /* clip evita barra horizontal sem criar scrollport como overflow:hidden;
+     caso contrario position:sticky no header deixa de funcionar. */
+  overflow-x: clip;
 }
 
 body {

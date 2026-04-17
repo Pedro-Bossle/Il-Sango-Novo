@@ -21,6 +21,12 @@ function getMensagemErroAuth(errorMessage) {
   if (msg.includes('network request failed')) {
     return 'Falha de conexao. Verifique sua internet e tente novamente.';
   }
+  if (msg.includes('failed to fetch') || msg.includes('load failed') || msg.includes('networkerror')) {
+    return (
+      'Nao foi possivel contactar o servidor (rede/DNS). Confira a internet, tente outro DNS (ex.: 8.8.8.8 ou 1.1.1.1), ' +
+      'desative VPN temporariamente e confirme se REACT_APP_SUPABASE_URL no .env.local coincide com o URL do projeto no painel do Supabase.'
+    );
+  }
 
   return 'Nao foi possivel concluir a acao agora. Tente novamente em instantes.';
 }
