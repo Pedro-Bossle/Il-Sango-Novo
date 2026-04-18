@@ -9,7 +9,7 @@ type Props = {
   qualidadeId: string;
   onOrixaChange: (id: string) => void;
   onQualidadeChange: (id: string) => void;
-  /** Secção Orixás (B): reza por par. Omitir em Orumalé. */
+  /** Secção Orisás: reza por par. Omitir em Orumalé. */
   placeholderOrixaNome?: string;
   rezaValue?: string;
   onRezaChange?: (value: string) => void;
@@ -58,7 +58,7 @@ export function OrixaQualidadePair({
       <h3 className="dash-orixa-pair__label">{label}</h3>
       <div className="dash-form-grid dash-form-grid--pair">
         <label className="dash-field">
-          <span>Orixá</span>
+          <span>Orisá</span>
           <select value={orixaId} onChange={(e) => onOrixaChange(e.target.value)}>
             <option value="">—</option>
             {orixas.map((o) => (

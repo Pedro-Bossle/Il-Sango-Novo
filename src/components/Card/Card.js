@@ -6,7 +6,7 @@ const Card = () => {
 
             <div className="card tiago">
                 <div className="card-titulo-container">
-                    <img className="card-foto" src="./images/tiago.jpg" alt="Tiago de Xango Aganju" />
+                    <img className="card-foto" src="/images/tiago.jpg" alt="Tiago de Sàngó Aganjù" />
                     <div>
                         <h3 className="card-nome">Tiago de Sàngó Aganjù</h3>
                         <h5 className="card-sub">X Anos de Experiência</h5>
@@ -19,7 +19,7 @@ const Card = () => {
 
             <div className="card rosangela">
                 <div className="card-titulo-container">
-                    <img className="card-foto" src="./images/rosangela.png" alt="Rosangela de Oxum Panda" />
+                    <img className="card-foto" src="/images/rosangela.png" alt="Rosangela de Oṣun Pandá" />
                     <div>
                         <h3 className="card-nome">Rosangela de Oṣun Pandá</h3>
                         <h5 className="card-sub">X Anos de Experiência</h5>

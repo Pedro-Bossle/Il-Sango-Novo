@@ -1,11 +1,28 @@
-import type { Cobranca } from '../../../types/database';
-import { isCobrancaPendente, valorSaldoCobranca, valorTotalCobranca } from '../../../services/cobrancas';
+import { useMemo } from 'react';
+import {
+  isCobrancaPendente,
+  valorSaldoCobranca,
+  valorTotalCobranca,
+  type CobrancaComMembro,
+} from '../../../services/cobrancas';
+import { formatDateBR } from '../../../utils/formatDate';
 
 type Props = {
-  cobrancas: Cobranca[];
+  cobrancas: CobrancaComMembro[];
+  onEdit: (c: CobrancaComMembro) => void;
+  onDelete: (c: CobrancaComMembro) => void;
 };
 
-export function CobrancasReadOnlySummary({ cobrancas }: Props) {
+const formatBRL = (n: number) =>
+  n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
+
+export function CobrancasReadOnlySummary({ cobrancas, onEdit, onDelete }: Props) {
+  const subtotalDevido = useMemo(
+    () =>
+      cobrancas.filter((c) => isCobrancaPendente(c)).reduce((a, c) => a + valorSaldoCobranca(c), 0),
+    [cobrancas],
+  );
+
   if (cobrancas.length === 0) {
     return (
       <section className="dash-form-section">
@@ -18,15 +35,16 @@ export function CobrancasReadOnlySummary({ cobrancas }: Props) {
   return (
     <section className="dash-form-section">
       <h2 className="dash-form-section__title">Cobranças (resumo)</h2>
-      <p className="dash-muted">Apenas leitura. Para criar ou editar, use o menu Cobranças.</p>
+      <p className="dash-muted">Edite ou exclua por linha; para a lista completa use o menu Cobranças.</p>
       <div className="dash-table-scroll">
-        <table className="dash-table">
+        <table className="dash-table dash-table--cobrancas-resumo">
           <thead>
             <tr>
               <th>Data</th>
               <th>Valor</th>
               <th>Descrição</th>
               <th>Situação</th>
+              <th className="dash-th-static">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -36,7 +54,7 @@ export function CobrancasReadOnlySummary({ cobrancas }: Props) {
               const saldo = valorSaldoCobranca(c);
               return (
                 <tr key={c.id}>
-                  <td>{c.vencimento || '—'}</td>
+                  <td>{formatDateBR(c.vencimento ?? null)}</td>
                   <td>
                     R$ {total.toFixed(2)}
                     {saldo > 0.001 && saldo < total - 0.001 && (
@@ -49,12 +67,35 @@ export function CobrancasReadOnlySummary({ cobrancas }: Props) {
                       {pendente ? 'Devendo' : 'Em dia'}
                     </span>
                   </td>
+                  <td className="dash-cob-resumo-acoes">
+                    <button
+                      type="button"
+                      className="dash-icon-action dash-icon-action--edit"
+                      aria-label="Editar cobrança"
+                      title="Editar"
+                      onClick={() => onEdit(c)}
+                    >
+                      ✎
+                    </button>
+                    <button
+                      type="button"
+                      className="dash-icon-action dash-icon-action--danger"
+                      aria-label="Excluir cobrança"
+                      title="Excluir"
+                      onClick={() => onDelete(c)}
+                    >
+                      ×
+                    </button>
+                  </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
+      <p className="dash-cob-subtotal dash-cob-resumo-subtotal" role="status">
+        <strong>Subtotal em aberto (devendo):</strong> {formatBRL(subtotalDevido)}
+      </p>
     </section>
   );
 }

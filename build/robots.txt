@@ -1,3 +1,5 @@
-# https://www.robotstxt.org/robotstxt.html
+# Substitua pelo domínio real em produção (ex.: https://seudominio.com.br/sitemap.xml)
 User-agent: *
-Disallow:
+Allow: /
+
+Sitemap: https://seudominio.com.br/sitemap.xml

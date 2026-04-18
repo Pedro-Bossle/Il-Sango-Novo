@@ -8,12 +8,14 @@
   margin-bottom: 1.5rem;
 }
 
-.contato-hero h2 {
+.contato-hero__title {
   margin: 0 0 0.4rem;
   color: var(--bordo);
+  font-family: var(--fonte-secundaria);
+  font-size: clamp(1.6rem, 3vw, 2rem);
 }
 
-.contato-hero p {
+.contato-hero__lead {
   margin: 0;
   color: var(--cinza-fonte);
 }
@@ -34,9 +36,10 @@
   gap: 0.7rem;
 }
 
-.contato-card h3 {
+.contato-card__title {
   margin: 0;
   color: var(--bordo);
+  font-size: 1.1rem;
 }
 
 .contato-link,
@@ -63,6 +66,27 @@
   color: var(--cinza);
 }
 
+.contato-map-wrap {
+  margin-top: 2rem;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.contato-map__title {
+  margin: 0 0 0.75rem;
+  color: var(--bordo);
+  font-family: var(--fonte-secundaria);
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.contato-map {
+  width: 100%;
+  min-height: 300px;
+  display: block;
+}
+
 .contato-social {
   margin-top: 1rem;
   display: flex;
@@ -82,11 +106,11 @@
 }
 
 @media (max-width: 700px) {
-  .contato-hero h2 {
+  .contato-hero__title {
     font-size: 1.5rem;
   }
 
-  .contato-hero p {
+  .contato-hero__lead {
     font-size: 0.95rem;
   }
 

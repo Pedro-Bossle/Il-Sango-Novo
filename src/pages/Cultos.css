@@ -1,0 +1,78 @@
+.cultos-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+}
+
+.cultos-hero {
+  text-align: center;
+  padding: 2rem 0 1.5rem;
+}
+
+.cultos-hero__title {
+  margin: 0;
+  font-family: var(--fonte-secundaria);
+  color: var(--bordo);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+}
+
+.cultos-hero__lead {
+  margin: 0.5rem 0 0;
+  color: var(--cinza-fonte);
+}
+
+.cultos-section {
+  padding: 2rem 0;
+  border-bottom: 1px solid rgba(83, 5, 38, 0.1);
+}
+
+.cultos-section:last-of-type {
+  border-bottom: none;
+}
+
+.cultos-section__title {
+  margin: 0 0 1rem;
+  font-family: var(--fonte-secundaria);
+  color: var(--bordo);
+  font-size: 1.35rem;
+  text-align: center;
+}
+
+.cultos-section__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.cultos-section__text p {
+  margin: 0;
+  line-height: 1.65;
+  color: var(--cinza-fonte);
+}
+
+.cultos-section__gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.cultos-section__img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid rgba(83, 5, 38, 0.12);
+  background: var(--branco-puro);
+}
+
+@media (max-width: 767px) {
+  .cultos-section__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cultos-section__grid--text-right .cultos-section__gallery,
+  .cultos-section__grid--text-left .cultos-section__gallery {
+    order: -1;
+  }
+}

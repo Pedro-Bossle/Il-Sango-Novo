@@ -33,7 +33,7 @@ export function OrumaleSection({ orixas, rows, addRow, removeRow, updateRow }: P
             </button>
           </div>
           <OrixaQualidadePair
-            label="Orixá e qualidade"
+            label="Orisá e qualidade"
             orixas={orixas}
             orixaId={row.orixa_id}
             qualidadeId={row.qualidade_id}

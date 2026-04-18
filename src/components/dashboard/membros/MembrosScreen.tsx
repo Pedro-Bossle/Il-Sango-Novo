@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchPessoasLista, deletePessoa } from '../../../services/membros';
-import { fetchCobrancasComMembros, pessoaEstaDevendo } from '../../../services/cobrancas';
-import type { Cobranca, UUID } from '../../../types/database';
+import {
+  deleteCobranca,
+  fetchCobrancasComMembros,
+  pessoaEstaDevendo,
+  updateCobranca,
+  type CobrancaComMembro,
+} from '../../../services/cobrancas';
+import { fetchPessoasOptions } from '../../../services/pessoasLookup';
+import type { UUID } from '../../../types/database';
 import { resolvePessoaIdCobranca } from '../../../types/database';
 import { useMemberForm } from '../../../hooks/useMemberForm';
 import { Toast } from '../Toast';
@@ -9,10 +16,12 @@ import { PessoaisSection } from './PessoaisSection';
 import { OrixasSection } from './OrixasSection';
 import { OrumaleSection } from './OrumaleSection';
 import { ExusSection } from './ExusSection';
+import { UmbandaSection } from './UmbandaSection';
+import { CobrancaForm, type CobrancaFormValues } from '../cobrancas/CobrancaForm';
 import { CobrancasReadOnlySummary } from './CobrancasReadOnlySummary';
 import type { PessoaListaItem } from '../../../services/membros';
 
-const BUSCA_MEMBROS_PLACEHOLDER = 'Pesquisar por nome, orixá de cabeça ou telefone';
+const BUSCA_MEMBROS_PLACEHOLDER = 'Pesquisar por nome, orisá de cabeça ou telefone';
 
 type View = 'list' | 'form';
 
@@ -20,7 +29,10 @@ export function MembrosScreen() {
   const [view, setView] = useState<View>('list');
   const [editId, setEditId] = useState<UUID | null>(null);
   const [lista, setLista] = useState<PessoaListaItem[]>([]);
-  const [cobrancas, setCobrancas] = useState<Cobranca[]>([]);
+  const [cobrancas, setCobrancas] = useState<CobrancaComMembro[]>([]);
+  const [cobrancaFormOpen, setCobrancaFormOpen] = useState(false);
+  const [cobrancaEditing, setCobrancaEditing] = useState<CobrancaComMembro | null>(null);
+  const [cobrancaDelete, setCobrancaDelete] = useState<CobrancaComMembro | null>(null);
   const [loadingLista, setLoadingLista] = useState(true);
   const [toast, setToast] = useState<{ msg: string; variant: 'success' | 'error' } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<UUID | null>(null);
@@ -38,6 +50,40 @@ export function MembrosScreen() {
       setLoadingLista(false);
     }
   }, []);
+
+  const salvarCobrancaPerfil = async (values: CobrancaFormValues) => {
+    if (!cobrancaEditing) return;
+    const opts = await fetchPessoasOptions();
+    const p = opts.find((x) => x.id === values.pessoa_id);
+    const nome = p?.nome ?? '';
+    if (!nome) {
+      setToast({ msg: 'Membro não encontrado.', variant: 'error' });
+      return;
+    }
+    await updateCobranca(cobrancaEditing.id, {
+      pessoa_id: values.pessoa_id,
+      membro_nome: nome,
+      valor: values.valor,
+      data: values.data,
+      descricao: values.descricao || null,
+      tipo: values.tipo,
+    });
+    setToast({ msg: 'Cobrança atualizada.', variant: 'success' });
+    await reloadAll();
+    setCobrancaEditing(null);
+  };
+
+  const confirmDeleteCobranca = async () => {
+    if (!cobrancaDelete) return;
+    try {
+      await deleteCobranca(cobrancaDelete.id);
+      setCobrancaDelete(null);
+      setToast({ msg: 'Cobrança excluída.', variant: 'success' });
+      await reloadAll();
+    } catch (e) {
+      setToast({ msg: e instanceof Error ? e.message : 'Erro ao excluir.', variant: 'error' });
+    }
+  };
 
   useEffect(() => {
     reloadAll();
@@ -77,6 +123,9 @@ export function MembrosScreen() {
     setView('list');
     setEditId(null);
     form.setError(null);
+    setCobrancaFormOpen(false);
+    setCobrancaEditing(null);
+    setCobrancaDelete(null);
   };
 
   const handleDelete = async (id: UUID) => {
@@ -153,7 +202,22 @@ export function MembrosScreen() {
                 removeRow={form.removeExu}
                 updateRow={form.updateExu}
               />
-              {editId && <CobrancasReadOnlySummary cobrancas={cobrancasDoPerfil} />}
+              <UmbandaSection
+                rows={form.umbanda}
+                addRow={form.addUmbanda}
+                removeRow={form.removeUmbanda}
+                updateRow={form.updateUmbanda}
+              />
+              {editId && (
+                <CobrancasReadOnlySummary
+                  cobrancas={cobrancasDoPerfil}
+                  onEdit={(c) => {
+                    setCobrancaEditing(c);
+                    setCobrancaFormOpen(true);
+                  }}
+                  onDelete={setCobrancaDelete}
+                />
+              )}
               <div className="dash-form-actions">
                 <button type="button" className="dash-btn-secondary" onClick={backToList}>
                   Cancelar
@@ -165,6 +229,33 @@ export function MembrosScreen() {
             </form>
           )}
         </div>
+
+        <CobrancaForm
+          open={cobrancaFormOpen}
+          initial={cobrancaEditing}
+          onClose={() => {
+            setCobrancaFormOpen(false);
+            setCobrancaEditing(null);
+          }}
+          onSave={salvarCobrancaPerfil}
+        />
+
+        {cobrancaDelete && (
+          <div className="dash-modal-overlay" role="dialog" aria-modal="true">
+            <div className="dash-modal dash-modal--narrow">
+              <h2>Excluir cobrança?</h2>
+              <p>Esta ação não pode ser desfeita.</p>
+              <div className="dash-form-actions">
+                <button type="button" className="dash-btn-secondary" onClick={() => setCobrancaDelete(null)}>
+                  Cancelar
+                </button>
+                <button type="button" className="dash-btn-danger" onClick={() => void confirmDeleteCobranca()}>
+                  Excluir
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {deleteConfirm && (
           <div className="dash-modal-overlay" role="dialog" aria-modal="true">
@@ -222,7 +313,7 @@ export function MembrosScreen() {
               <tr>
                 <th>Membro</th>
                 <th>Telefone</th>
-                <th>Orixá cabeça</th>
+                <th>Orisá cabeça</th>
                 <th>Situação</th>
                 <th />
               </tr>

@@ -6,13 +6,15 @@ import {
   filtroPeriodoVazio,
   insertCobranca,
   isCobrancaPendente,
+  isMensalidadeTipo,
   updateCobranca,
   valorSaldoCobranca,
   type CobrancaComMembro,
   type FiltroPeriodoCobranca,
 } from '../../../services/cobrancas';
 import { fetchPessoasOptions } from '../../../services/pessoasLookup';
-import { gerarPdfRelatorio } from '../../../utils/pdfRelatorio';
+import { formatDateBR } from '../../../utils/formatDate';
+import { gerarPdfRelatorio, type LinhaRelatorio } from '../../../utils/pdfRelatorio';
 import { Toast } from '../Toast';
 import { CobrancaForm, type CobrancaFormValues } from './CobrancaForm';
 import { CobrancasTable } from './CobrancasTable';
@@ -71,6 +73,26 @@ export function CobrancasScreen() {
     }
     return list;
   }, [rows, periodoAplicado, buscaMembro]);
+
+  /** Soma dos saldos em aberto respeitando a mesma lista filtrada da tabela (período + nome). */
+  const subtotalAberto = useMemo(() => {
+    return filtered.filter((c) => isCobrancaPendente(c)).reduce((a, c) => a + valorSaldoCobranca(c), 0);
+  }, [filtered]);
+
+  const formatBRL = (n: number) =>
+    n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
+
+  const montarLinhasPdf = (lista: CobrancaComMembro[]): LinhaRelatorio[] => {
+    return lista
+      .filter((c) => isCobrancaPendente(c))
+      .map((c) => ({
+        nome: c.membro_nome,
+        data: formatDateBR(c.vencimento ?? c.created_at?.slice(0, 10) ?? null),
+        descricao: c.descricao || '—',
+        valor: valorSaldoCobranca(c),
+        tipo: c.tipo,
+      }));
+  };
 
   const aplicarFiltro = () => {
     const { de, ate } = rascunhoPeriodo;
@@ -150,16 +172,45 @@ export function CobrancasScreen() {
       setToast({ msg: 'Aplique um período (De / Até) antes de gerar o relatório.', variant: 'error' });
       return;
     }
-    const base = rows.filter((c) => cobrancaPassaFiltroIntervalo(c, periodoAplicado));
-    const pendentes = base.filter((c) => isCobrancaPendente(c));
-    const linhas = pendentes.map((c) => ({
-      nome: c.membro_nome,
-      data: c.vencimento || c.created_at?.slice(0, 10) || '—',
-      descricao: c.descricao || '—',
-      valor: valorSaldoCobranca(c),
-    }));
+    const linhas = montarLinhasPdf(filtered);
     const total = linhas.reduce((a, b) => a + b.valor, 0);
-    gerarPdfRelatorio(periodoAplicado, linhas, total);
+    const subt =
+      buscaMembro.trim().length > 0 ? `Filtro de nome ativo: “${buscaMembro.trim()}”.` : undefined;
+    gerarPdfRelatorio({
+      periodo: periodoAplicado,
+      linhas,
+      total,
+      tituloPrincipal: 'Relatório por período — saldos em aberto',
+      subtitulo: subt,
+    });
+  };
+
+  const gerarRelatorioPorNome = () => {
+    if (!buscaMembro.trim()) {
+      setToast({ msg: 'Digite um nome na pesquisa antes de gerar o relatório por nome.', variant: 'error' });
+      return;
+    }
+    const linhas = montarLinhasPdf(filtered);
+    const total = linhas.reduce((a, b) => a + b.valor, 0);
+    gerarPdfRelatorio({
+      periodo: periodoAplicado,
+      linhas,
+      total,
+      tituloPrincipal: 'Relatório por nome — saldos em aberto',
+      subtitulo: `Pesquisa: “${buscaMembro.trim()}”.`,
+    });
+  };
+
+  const gerarRelatorioMensalidadesAberto = () => {
+    const linhas = montarLinhasPdf(filtered.filter((c) => isMensalidadeTipo(c)));
+    const total = linhas.reduce((a, b) => a + b.valor, 0);
+    gerarPdfRelatorio({
+      periodo: periodoAplicado,
+      linhas,
+      total,
+      tituloPrincipal: 'Mensalidades em aberto',
+      subtitulo: 'Apenas cobranças do tipo Mensalidade com saldo pendente (filtros atuais).',
+    });
   };
 
   const abrirCobrancaEmMassa = () => {
@@ -254,9 +305,15 @@ export function CobrancasScreen() {
           </button>
           {periodoAplicado?.de && periodoAplicado?.ate && (
             <button type="button" className="dash-btn-primary" onClick={gerarRelatorio}>
-              Gerar relatório
+              Gerar relatório (período)
             </button>
           )}
+          <button type="button" className="dash-btn-secondary" onClick={gerarRelatorioPorNome}>
+            Gerar relatório por nome
+          </button>
+          <button type="button" className="dash-btn-secondary" onClick={gerarRelatorioMensalidadesAberto}>
+            Mensalidades em aberto (PDF)
+          </button>
         </div>
       </div>
 
@@ -282,7 +339,12 @@ export function CobrancasScreen() {
       {loading ? (
         <p>Carregando…</p>
       ) : (
-        <CobrancasTable rows={filtered} onEdit={openEdit} onDelete={setDeleteTarget} onRefresh={reload} />
+        <>
+          <CobrancasTable rows={filtered} onEdit={openEdit} onDelete={setDeleteTarget} onRefresh={reload} />
+          <p className="dash-cob-subtotal" role="status">
+            <strong>Subtotal em aberto (filtros atuais):</strong> {formatBRL(subtotalAberto)}
+          </p>
+        </>
       )}
 
       <CobrancaForm open={formOpen} initial={editing} onClose={() => setFormOpen(false)} onSave={salvar} />
@@ -305,7 +367,7 @@ export function CobrancasScreen() {
                 </select>
               </label>
               <label className="dash-field">
-                <span>Vencimento</span>
+                <span>Data vencimento</span>
                 <input type="date" value={bulkValues.data} onChange={(e) => setBulkValues((v) => ({ ...v, data: e.target.value }))} />
               </label>
               <label className="dash-field">

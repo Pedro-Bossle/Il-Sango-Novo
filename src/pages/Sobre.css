@@ -1,0 +1,56 @@
+.sobre-page {
+  padding-bottom: 2rem;
+}
+
+.sobre-page__header {
+  text-align: center;
+  padding: 1.5rem 1rem 0;
+}
+
+.sobre-page__h1 {
+  margin: 0;
+  font-family: var(--fonte-secundaria);
+  color: var(--bordo);
+  font-size: clamp(1.75rem, 4vw, 2.1rem);
+}
+
+.sobre-mission {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+.sobre-mission__title {
+  margin: 0 0 0.75rem;
+  font-family: var(--fonte-secundaria);
+  color: var(--bordo);
+  font-size: 1.35rem;
+  text-align: center;
+}
+
+.sobre-mission__text {
+  margin: 0;
+  line-height: 1.65;
+  color: var(--cinza-fonte);
+  text-align: center;
+}
+
+.sobre-dirigentes {
+  padding: 0 0 2rem;
+}
+
+.sobre-dirigentes__title {
+  margin: 0 0 0.5rem;
+  font-family: var(--fonte-secundaria);
+  color: var(--bordo);
+  font-size: 1.35rem;
+  text-align: center;
+}
+
+.sobre-dirigentes__desc {
+  margin: 0 auto 1rem;
+  max-width: 720px;
+  text-align: center;
+  color: var(--cinza-fonte);
+  padding: 0 1rem;
+}

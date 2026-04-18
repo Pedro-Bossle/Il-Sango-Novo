@@ -33,6 +33,7 @@ const Header = () => {
                 <NavLink className="header-menu" to="/sobre" onClick={handleCloseMenu}>Sobre Nós</NavLink>
                 <NavLink className="header-menu" to="/eventos" onClick={handleCloseMenu}>Calendário</NavLink>
                 <NavLink className="header-menu" to="/catalogo" onClick={handleCloseMenu}>Catálogo</NavLink>
+                <NavLink className="header-menu" to="/cultos" onClick={handleCloseMenu}>Cultos</NavLink>
                 <NavLink className="header-menu" to="/contato" onClick={handleCloseMenu}>Contato</NavLink>
                 <NavLink className="header-menu login-button" to="/login" onClick={handleCloseMenu}><img className='button_icon' src="/images/icons/user-icon.png" alt=''/> Área Restrita</NavLink>
             </nav>

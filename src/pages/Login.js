@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import { PageMeta } from '../components/Seo/PageMeta';
 import './Auth.css';
 
 function getMensagemErroAuth(errorMessage) {
@@ -87,8 +88,9 @@ const Login = () => {
 
   return (
     <section className="auth-page">
+      <PageMeta title="Área restrita" path="/login" description="Acesso reservado a membros autorizados do Ilê." />
       <form className="auth-card" onSubmit={handleLogin}>
-        <h2>Area Restrita</h2>
+        <h1 className="auth-card__title">Área restrita</h1>
         <p>Entre com seu email e senha.</p>
 
         <label htmlFor="email">Email</label>

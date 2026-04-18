@@ -521,6 +521,35 @@
   font-family: inherit;
 }
 
+/* Orisá: grelha 4 colunas (desktop), sobrenome em linha abaixo (meia largura) */
+.dash-orisa-quad {
+  margin-bottom: 1.25rem;
+}
+
+.dash-orisa-quad__row4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.dash-orisa-quad__row4 .dash-field input,
+.dash-orisa-quad__row4 .dash-field select {
+  font-size: 0.88rem;
+  padding: 0.5rem 0.6rem;
+  min-height: 42px;
+}
+
+.dash-orisa-quad__row2 {
+  max-width: 50%;
+  margin-top: 0.45rem;
+}
+
+.dash-orisa-quad__row2 .dash-field input,
+.dash-orisa-quad__row2 .dash-field select {
+  font-size: 0.88rem;
+}
+
 .dash-dynamic-block {
   border: 1px dashed #d4ccc4;
   border-radius: 10px;
@@ -725,6 +754,10 @@
   .dash-form-grid--pair {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .dash-orisa-quad__row4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 767px) {
@@ -733,9 +766,28 @@
     grid-template-columns: 1fr;
   }
 
+  .dash-orisa-quad__row4 {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-orisa-quad__row2 {
+    max-width: 100%;
+  }
+
   .dash-panel-slide {
     width: 100%;
   }
+}
+
+/* Subtotal de saldos em aberto (respeita filtros da tabela) */
+.dash-cob-subtotal {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  background: #f7f2ed;
+  border: 1px solid #e4d8ca;
+  font-size: 1rem;
+  color: #333;
 }
 
 /* Cobranças: período De/Até, tabela alargada, progresso, tipo */
@@ -799,6 +851,98 @@
 
 .dash-table--cobrancas {
   min-width: 920px;
+}
+
+/* Resumo de cobranças no formulário de membro */
+.dash-table--cobrancas-resumo {
+  min-width: 560px;
+}
+
+.dash-cob-resumo-acoes {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.dash-icon-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  margin: 0 0.2rem 0 0;
+  padding: 0;
+  border: 1px solid #c9c4bf;
+  border-radius: 8px;
+  background: var(--branco-puro, #fff);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--bordo);
+}
+
+.dash-icon-action:last-child {
+  margin-right: 0;
+}
+
+.dash-icon-action--danger {
+  border-color: #e8b4b4;
+  color: #a32a2a;
+}
+
+.dash-icon-action:hover {
+  background: #f7f2ed;
+}
+
+.dash-icon-action:focus-visible {
+  outline: 2px solid var(--bordo);
+  outline-offset: 2px;
+}
+
+.dash-cob-resumo-subtotal {
+  margin-top: 0.75rem;
+}
+
+.dash-table--cobrancas .dash-th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  max-width: 100%;
+}
+
+.dash-table--cobrancas .dash-th-sort:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.dash-table--cobrancas .dash-th-sort:focus-visible {
+  outline: 2px solid var(--bordo, #6b1c2e);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.dash-table--cobrancas .dash-th-sort__icons {
+  flex-shrink: 0;
+  font-size: 0.72em;
+  opacity: 0.55;
+  line-height: 1;
+}
+
+.dash-table--cobrancas th[aria-sort='ascending'] .dash-th-sort__icons,
+.dash-table--cobrancas th[aria-sort='descending'] .dash-th-sort__icons {
+  opacity: 1;
+}
+
+.dash-table--cobrancas .dash-th-static {
+  cursor: default;
 }
 
 .dash-cob-valores {

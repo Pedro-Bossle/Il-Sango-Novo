@@ -5,7 +5,7 @@ const Banner = () => {
         <section id="inicio">
             <div className="banner">
                 <div className="banner_titulo_container">
-                    <h2 className="banner_titulo">Ilê Asé Sàngó Aganjù e Oṣun Pandá</h2>
+                    <h1 className="banner_titulo">Ilê Asé Sàngó Aganjù e Oṣun Pandá</h1>
                     <h3 className="banner_subtitulo">Desde 08 de Outubro de 2022</h3>
 
                 </div>

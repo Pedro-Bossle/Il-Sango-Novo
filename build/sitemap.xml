@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Atualize a tag <loc> com o domínio público em produção -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://seudominio.com.br/</loc><changefreq>weekly</changefreq><priority>1</priority></url>
+  <url><loc>https://seudominio.com.br/sobre</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://seudominio.com.br/eventos</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://seudominio.com.br/catalogo</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://seudominio.com.br/cultos</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://seudominio.com.br/contato</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://seudominio.com.br/termos-de-uso</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://seudominio.com.br/politica-de-privacidade</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+</urlset>

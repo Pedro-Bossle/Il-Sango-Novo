@@ -7,6 +7,7 @@ import {
   valorTotalCobranca,
   type CobrancaComMembro,
 } from '../../../services/cobrancas';
+import { formatDateBR } from '../../../utils/formatDate';
 import { RegistrarPagamentoModal } from './RegistrarPagamentoModal';
 import { HistoricoPagamentosModal } from './HistoricoPagamentosModal';
 
@@ -16,17 +17,6 @@ type Props = {
   onDelete: (c: CobrancaComMembro) => void;
   onRefresh: () => void;
 };
-
-/** Vencimento vindo da BD como YYYY-MM-DD — evita desvio de dia com `new Date` em UTC. */
-function formatarVencimentoBR(raw: string | null | undefined): string {
-  if (raw == null || String(raw).trim() === '') return '—';
-  const s = String(raw).trim();
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
-  if (m) return `${m[3]}/${m[2]}/${m[1]}`;
-  const d = new Date(s);
-  if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
 
 function badgeTipo(t: string | null | undefined): { label: string; className: string } {
   if (t === 'mensalidade') return { label: 'Mensalidade', className: 'dash-badge-tipo dash-badge-tipo--mensalidade' };
@@ -46,19 +36,13 @@ export function CobrancaRow({ cobranca, onEdit, onDelete, onRefresh }: Props) {
   const pct = obrigacao ? progressoPagamentoObrigacao(cobranca) * 100 : 0;
   const tipoBadge = badgeTipo(cobranca.tipo);
 
-  const dataCriacao = (() => {
-    const raw = cobranca.created_at;
-    if (!raw) return '—';
-    const d = new Date(raw);
-    if (Number.isNaN(d.getTime())) return '—';
-    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  })();
+  const dataCriacao = formatDateBR(cobranca.created_at ?? null);
 
   return (
     <>
       <tr>
         <td className="dash-cob-criacao">{dataCriacao}</td>
-        <td>{formatarVencimentoBR(cobranca.vencimento)}</td>
+        <td>{formatDateBR(cobranca.vencimento)}</td>
         <td>{cobranca.membro_nome}</td>
         <td>
           <span className={tipoBadge.className}>{tipoBadge.label}</span>

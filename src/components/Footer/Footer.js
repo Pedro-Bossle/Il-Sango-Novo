@@ -1,4 +1,5 @@
 import "./Footer.css"
+import { Link } from "react-router-dom"
 
 const Footer = () => {
     return (
@@ -17,8 +18,8 @@ const Footer = () => {
                         <p className="footer-text">Um espaço sagrado dedicado ao crescimento espiritual, cura e orientação.<br></br> Há mais de 4 anos servindo nossa comunidade com amor e dedicação.
                         </p>
                         <ul className="ul-social">
-                            <a className="footer-social_link" href="https://www.instagram.com/"><img className="icon" src="/images/icons/ico instagram.png" alt="instagram icon"></img>@ileasesangoosun</a>
-                            <a className="footer-social_link" href="https://www.facebook.com/"><img className="icon" src="/images/icons/ico facebook.png" alt="facebook icon"></img>Ilê Asé Sango e Osun</a>
+                            <a className="footer-social_link" href="https://www.instagram.com/ile_sango_osun/" target="_blank" rel="noopener noreferrer"><img className="icon" src="/images/icons/ico instagram.png" alt="instagram icon"></img>@ile_sango_osun</a>
+                            <a className="footer-social_link" href="https://www.facebook.com/profile.php?id=61569272685776" target="_blank" rel="noopener noreferrer"><img className="icon" src="/images/icons/ico facebook.png" alt="facebook icon"></img>Ilê Asè Sàngó Aganjù e Osun Pandà</a>
                         </ul>
                     </div>
                     <div className="footer-contacts">
@@ -41,10 +42,9 @@ const Footer = () => {
 
                 <ul className="ul-copyright">
                     <p className="footer__copyright"> © 2025 Ilê Asé Sàngó Aganjù e Osun Pandá. Todos os direitos reservados.<br></br> Feito por <a className="footer__copyright-link" href="https://www.linkedin.com/in/pedro-bossle-sandi-685625277/" target="_blank" rel="noreferrer">Pedro Bossle Sandi</a></p>
-                    <div>
-                        <a href="https://youtube.com">Política de Privacidade</a>
-                        <a href="https://youtube.com">Termos de uso</a>
-
+                    <div className="footer-legal-links">
+                        <Link to="/politica-de-privacidade">Política de Privacidade</Link>
+                        <Link to="/termos-de-uso">Termos de uso</Link>
                     </div>
                 </ul>
             </div>

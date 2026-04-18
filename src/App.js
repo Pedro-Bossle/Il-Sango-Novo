@@ -10,6 +10,9 @@ import Catalogo from './pages/Catalogo';
 import Contato from './pages/Contato';
 import Login from './pages/Login';
 import RedefinirSenha from './pages/RedefinirSenha';
+import Cultos from './pages/Cultos';
+import TermosDeUso from './pages/TermosDeUso';
+import PoliticaPrivacidade from './pages/PoliticaPrivacidade';
 import Dashboard from './pages/Dashboard';
 
 function App() {
@@ -51,6 +54,9 @@ function App() {
       <Route path="/eventos" element={renderWithLayout(<Calendario />)} />
       <Route path="/catalogo" element={renderWithLayout(<Catalogo />)} />
       <Route path="/contato" element={renderWithLayout(<Contato />)} />
+      <Route path="/cultos" element={renderWithLayout(<Cultos />)} />
+      <Route path="/termos-de-uso" element={renderWithLayout(<TermosDeUso />)} />
+      <Route path="/politica-de-privacidade" element={renderWithLayout(<PoliticaPrivacidade />)} />
       <Route path="/login" element={renderWithLayout(<Login />)} />
       <Route path="/redefinir-senha" element={renderWithLayout(<RedefinirSenha />)} />
       <Route path="/dashboard" element={<Dashboard />} />

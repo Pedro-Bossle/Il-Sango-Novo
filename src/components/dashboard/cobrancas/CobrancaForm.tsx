@@ -152,7 +152,7 @@ export function CobrancaForm({ open, initial, onClose, onSave }: Props) {
             </label>
 
             <label className="dash-field">
-              <span>Data</span>
+              <span>Data vencimento</span>
               <input
                 type="date"
                 required
